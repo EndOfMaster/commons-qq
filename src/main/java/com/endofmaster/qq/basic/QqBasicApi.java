@@ -3,6 +3,7 @@ package com.endofmaster.qq.basic;
 
 import com.endofmaster.qq.*;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -54,6 +55,10 @@ public class QqBasicApi {
                 .setArg("openid", openId);
         QqHttpResponse response = client.execute(request);
         return response.parse(QqAuthUserInfo.class);
+    }
+
+    public InputStream downloadImage(String url) {
+        return client.download(url);
     }
 
     public String getAppId() {

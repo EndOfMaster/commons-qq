@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -82,6 +83,16 @@ public class QqHttpClient {
             qqHttpResponse.setBody(httpResponse.getEntity().getContent());
             qqHttpResponse.setContentType(httpResponse.getEntity().getContentType().getValue());
             return qqHttpResponse;
+        } catch (IOException e) {
+            throw new QqException(e);
+        }
+    }
+
+    public InputStream download(String url) {
+        try {
+            HttpGet httpGet = new HttpGet(url);
+            HttpResponse httpResponse = httpClient.execute(httpGet);
+            return httpResponse.getEntity().getContent();
         } catch (IOException e) {
             throw new QqException(e);
         }

@@ -2,6 +2,7 @@ package com.endofmaster.qq.basic;
 
 import com.endofmaster.qq.QqResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 通过用户授权获取的用户信息
@@ -25,6 +26,16 @@ public class QqAuthUserInfo extends QqResponse {
 
     @JsonProperty("figureurl_2")
     private String spaceHeadImg100Url;
+
+    public String getAvatar() {
+        if (StringUtils.isNotBlank(headImg100Url)) {
+            return headImg100Url;
+        }
+        if (StringUtils.isNotBlank(spaceHeadImg100Url)) {
+            return spaceHeadImg100Url;
+        }
+        return headImgUrl;
+    }
 
     public String getNickName() {
         return nickName;
