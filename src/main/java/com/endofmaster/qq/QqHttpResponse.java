@@ -1,10 +1,16 @@
 package com.endofmaster.qq;
 
+import com.endofmaster.commons.util.StreamUtils;
+import com.endofmaster.commons.util.validate.ParamUtils;
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.util.Map;
 
 import static com.endofmaster.qq.QqHttpClient.MAPPER;
 
@@ -14,7 +20,7 @@ import static com.endofmaster.qq.QqHttpClient.MAPPER;
  */
 public class QqHttpResponse {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(QqHttpResponse.class);
+    private static final Logger logger = LoggerFactory.getLogger(QqHttpResponse.class);
 
     private int statusCode;
     private String reasonPhrase;
@@ -25,21 +31,30 @@ public class QqHttpResponse {
         this.statusCode = statusCode;
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends QqResponse> T parse(Class<T> tClass) throws QqException {
         try {
             if (statusCode >= 200 && statusCode < 300) {
-                String json = MAPPER.writeValueAsString(body);
-                LOGGER.debug("qq请求返回json：" + json);
-                T result = MAPPER.readValue(json, tClass);
+                String paramsStr = StreamUtils.copyToString(body, Charset.forName("UTF-8"));
+                logger.debug("qq请求返回paramsStr：" + paramsStr);
+                T result;
+                if (paramsStr.charAt(0) == '{') {
+                    result = MAPPER.readValue(paramsStr, tClass);
+                } else {
+                    Map<String, String> params = ParamUtils.parseKvString(paramsStr);
+                    Object obj = tClass.newInstance();
+                    BeanUtils.populate(obj, params);
+                    result = (T) obj;
+                }
                 if (!result.successful()) {
-                    LOGGER.error("QQ错误码：" + result.getCode() + ",错误内容：" + result.getMsg());
+                    logger.error("QQ错误码：" + result.getCode() + ",错误内容：" + result.getMsg());
                     throw new QqServerException(result.getMsg());
                 }
                 return result;
             } else {
                 throw new QqServerException("Failed to parse body, invalid status code");
             }
-        } catch (IOException e) {
+        } catch (IOException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             throw new QqClientException(e);
         }
     }

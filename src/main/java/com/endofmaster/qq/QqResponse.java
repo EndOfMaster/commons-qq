@@ -7,9 +7,7 @@ package com.endofmaster.qq;
 public class QqResponse {
 
     private int code;
-
     private int ret;
-
     private String msg;
 
     public boolean successful() {
