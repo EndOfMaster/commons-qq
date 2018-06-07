@@ -10,13 +10,13 @@ import java.io.UnsupportedEncodingException;
  */
 public class QqBasicApi {
     private final String appId;
-    private final String appSecret;
+    private final String appKey;
     private final String redirectUrl;
     private final QqHttpClient client;
 
-    public QqBasicApi(String appId, String appSecret, String redirectUrl, QqHttpClient client) {
+    public QqBasicApi(String appId, String appKey, String redirectUrl, QqHttpClient client) {
         this.appId = appId;
-        this.appSecret = appSecret;
+        this.appKey = appKey;
         this.redirectUrl = redirectUrl;
         this.client = client;
     }
@@ -32,12 +32,19 @@ public class QqBasicApi {
     public QqOauth2AccessToken getOauth2AccessToken(String code) throws QqException {
         QqHttpRequest request = new QqHttpRequest("https://graph.qq.com/oauth2.0/token")
                 .setArg("client_id", appId)
-                .setArg("client_secret", appSecret)
+                .setArg("client_secret", appKey)
                 .setArg("code", code)
                 .setArg("redirect_uri", redirectUrl)
                 .setArg("grant_type", "authorization_code");
         QqHttpResponse response = client.execute(request);
         return response.parse(QqOauth2AccessToken.class);
+    }
+
+    public QqOpenId getOauth2OpenId(String oauth2AccessToken) {
+        QqHttpRequest request = new QqHttpRequest("https://graph.qq.com/oauth2.0/me")
+                .setArg("access_token", oauth2AccessToken);
+        QqHttpResponse response = client.execute(request);
+        return response.parse(QqOpenId.class);
     }
 
     public QqAuthUserInfo getOauth2UserInfo(String openId, String oauth2AccessToken) throws QqException {
