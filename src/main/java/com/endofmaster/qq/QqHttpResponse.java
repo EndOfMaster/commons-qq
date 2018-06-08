@@ -1,14 +1,13 @@
 package com.endofmaster.qq;
 
 import com.endofmaster.commons.util.StreamUtils;
+import com.endofmaster.commons.util.json.JsonUtils;
 import com.endofmaster.commons.util.validate.ParamUtils;
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.Map;
 
@@ -37,15 +36,16 @@ public class QqHttpResponse {
             if (statusCode >= 200 && statusCode < 300) {
                 String paramsStr = StreamUtils.copyToString(body, Charset.forName("UTF-8"));
                 logger.debug("qq请求返回paramsStr：" + paramsStr);
-                T result;
-                if (paramsStr.charAt(0) == '{') {
-                    result = MAPPER.readValue(paramsStr, tClass);
-                } else {
-                    Map<String, String> params = ParamUtils.parseKvString(paramsStr);
-                    Object obj = tClass.newInstance();
-                    BeanUtils.populate(obj, params);
-                    result = (T) obj;
+                String json = paramsStr;
+                if (!JsonUtils.isJson(paramsStr)) {
+                    if (paramsStr.contains("=") && paramsStr.contains("&")) {
+                        Map<String, String> params = ParamUtils.parseKvString(paramsStr);
+                        json = MAPPER.writeValueAsString(params);
+                    } else {
+                        json = getJson(paramsStr);
+                    }
                 }
+                T result = MAPPER.readValue(json, tClass);
                 if (!result.successful()) {
                     logger.error("QQ错误码：" + result.getCode() + ",错误内容：" + result.getMsg());
                     throw new QqServerException(result.getMsg());
@@ -54,9 +54,15 @@ public class QqHttpResponse {
             } else {
                 throw new QqServerException("Failed to parse body, invalid status code");
             }
-        } catch (IOException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+        } catch (IOException e) {
             throw new QqClientException(e);
         }
+    }
+
+    private String getJson(String str) {
+        int i = str.indexOf("{");
+        int j = str.lastIndexOf("}") + 1;
+        return str.substring(i, j);
     }
 
     public int getStatusCode() {
