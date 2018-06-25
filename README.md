@@ -1,8 +1,32 @@
-# qq login java sdk
+# weibo login java sdk
 
 ## 步骤
-1. 构建跳转地址然后跳转，这里跳转到qq的页面了
-2. 用户如果点了授权，qq就会跳转到之前构建是传的回调地址
-3. 然后用给的code获取accessToken
-4. 用accessToken获取openId
-5. 用openId获取用户信息
+1. 注入QqBasicApi的bean或创建对象
+2. getBaseAuthorizeUrl或getMobileAuthorizeUrl创建跳转微博页面
+3. getOauth2AccessToken获取accessToken
+4. getOauth2OpenId获取openId
+5. getOauth2UserInfo查询用户信息
+
+## Maven Repository
+  https://dl.bintray.com/endofmaster/maven
+
+version: ![image](https://img.shields.io/badge/maven-1.0.0-green.svg)
+
+### Maven Import
+
+the x.y.z is version
+
+```xml
+ <dependency>
+   <groupId>com.endofmaster</groupId>
+   <artifactId>commons-qq</artifactId>
+   <version>x.y.z</version>
+   <type>pom</type>
+ </dependency>
+```
+
+### Gradle Import
+
+```gradle
+ compile 'com.endofmaster:commons-qq:x.y.z'
+```
