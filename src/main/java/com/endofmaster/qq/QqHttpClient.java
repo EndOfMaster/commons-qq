@@ -22,6 +22,8 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -40,6 +42,7 @@ import static org.apache.http.entity.ContentType.MULTIPART_FORM_DATA;
 public class QqHttpClient {
 
     static final ObjectMapper MAPPER = new ObjectMapper();
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     static {
         MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -114,6 +117,7 @@ public class QqHttpClient {
             if ("json".equalsIgnoreCase(qqHttpRequest.getDataType())) {
                 try {
                     String json = MAPPER.writeValueAsString(map);
+                    logger.debug("qq请求json：" + json);
                     StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
                     requestBuilder.setEntity(entity);
                 } catch (JsonProcessingException e) {
@@ -142,6 +146,7 @@ public class QqHttpClient {
             for (QqHttpRequest.Arg arg : qqHttpRequest.getArgs()) {
                 requestBuilder.addParameter(arg.key, arg.value.toString());
             }
+            logger.debug("qq请求连接：" + requestBuilder.getUri().toString());
         }
         return requestBuilder.build();
     }
