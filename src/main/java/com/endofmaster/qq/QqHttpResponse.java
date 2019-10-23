@@ -30,7 +30,6 @@ public class QqHttpResponse {
         this.statusCode = statusCode;
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends QqResponse> T parse(Class<T> tClass) throws QqException {
         try {
             if (statusCode >= 200 && statusCode < 300) {

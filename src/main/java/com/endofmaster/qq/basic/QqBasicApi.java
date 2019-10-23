@@ -1,10 +1,14 @@
 package com.endofmaster.qq.basic;
 
 
-import com.endofmaster.qq.*;
+import com.endofmaster.qq.QqException;
+import com.endofmaster.qq.QqHttpClient;
+import com.endofmaster.qq.QqHttpRequest;
+import com.endofmaster.qq.QqHttpResponse;
+import com.endofmaster.qq.QqUtils;
 
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * @author YQ.Huang
@@ -30,12 +34,12 @@ public class QqBasicApi {
         return QqUtils.getAuthorizeUrl(appId, redirectUrl, "get_user_info", state, "mobile");
     }
 
-    public QqOauth2AccessToken getOauth2AccessToken(String code) throws QqException {
+    public QqOauth2AccessToken getOauth2AccessToken(String code) throws QqException, UnsupportedEncodingException {
         QqHttpRequest request = new QqHttpRequest("https://graph.qq.com/oauth2.0/token")
                 .setArg("client_id", appId)
                 .setArg("client_secret", appKey)
                 .setArg("code", code)
-                .setArg("redirect_uri", redirectUrl)
+                .setArg("redirect_uri", URLEncoder.encode(redirectUrl,"UTF-8"))
                 .setArg("grant_type", "authorization_code");
         QqHttpResponse response = client.execute(request);
         return response.parse(QqOauth2AccessToken.class);
@@ -55,10 +59,6 @@ public class QqBasicApi {
                 .setArg("openid", openId);
         QqHttpResponse response = client.execute(request);
         return response.parse(QqAuthUserInfo.class);
-    }
-
-    public InputStream downloadImage(String url) {
-        return client.download(url);
     }
 
     public String getAppId() {
