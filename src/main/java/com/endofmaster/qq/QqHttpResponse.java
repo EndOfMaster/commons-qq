@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static com.endofmaster.qq.QqHttpClient.MAPPER;
@@ -33,7 +33,7 @@ public class QqHttpResponse {
     public <T extends QqResponse> T parse(Class<T> tClass) throws QqException {
         try {
             if (statusCode >= 200 && statusCode < 300) {
-                String paramsStr = StreamUtils.copyToString(body, Charset.forName("UTF-8"));
+                String paramsStr = StreamUtils.copyToString(body, StandardCharsets.UTF_8);
                 logger.debug("qq请求返回paramsStr：" + paramsStr);
                 String json = paramsStr;
                 if (!JsonUtils.isJson(paramsStr)) {
@@ -46,8 +46,8 @@ public class QqHttpResponse {
                 }
                 T result = MAPPER.readValue(json, tClass);
                 if (!result.successful()) {
-                    logger.error("QQ错误码：" + result.getCode() + ",错误内容：" + result.getMsg());
-                    throw new QqServerException(result.getMsg());
+                    logger.error("QQ错误码：" + result.getCode() + ",错误内容：" + result.getMsg() + ",另一个额错误内容：" + result.getDescription());
+                    throw new QqServerException("请求qq内部错误");
                 }
                 return result;
             } else {
