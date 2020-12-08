@@ -3,7 +3,7 @@ package com.endofmaster.qq;
 
 import com.endofmaster.qq.basic.QqAuthUserInfo;
 import com.endofmaster.qq.basic.QqBasicApi;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class QqBasicApiTest {
 
@@ -16,7 +16,7 @@ public class QqBasicApiTest {
 
     @Test
     public void getUserInfo(){
-        QqAuthUserInfo qqUserInfo = basicApi.getOauth2UserInfo("BC0EBE3DA853EB0BF520BDA03EA94FF4", "83D7BEF3321C98AFA3A9EF01473EA219");
+        QqAuthUserInfo qqUserInfo = basicApi.getOauth2UserInfo("******", "*****");
         System.err.println(qqUserInfo);
     }
 
