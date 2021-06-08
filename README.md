@@ -1,4 +1,4 @@
-# weibo login java sdk
+# qq login java sdk
 ![image](https://img.shields.io/badge/maven-1.0.2-green.svg)
 ## 步骤
 1. 注入QqBasicApi的bean或创建对象
